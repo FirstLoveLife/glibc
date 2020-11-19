@@ -102,11 +102,19 @@ ENTRY (MEMCPY)
 	tbz	tmp1, 5, 1f
 	ldp	B_l, B_h, [src, 16]
 	ldp	C_l, C_h, [srcend, -32]
-	stp	B_l, B_h, [dstin, 16]
-	stp	C_l, C_h, [dstend, -32]
+	//stp	B_l, B_h, [dstin, 16]
+	str B_l, [dstin, 16]
+	str B_h, [dstin, 24]
+	//stp	C_l, C_h, [dstend, -32]
+	str C_l, [dstend, -32]
+	str C_h, [dstend, -24]
 1:
-	stp	A_l, A_h, [dstin]
-	stp	D_l, D_h, [dstend, -16]
+	//stp	A_l, A_h, [dstin]
+	str A_l, [dstin]
+	str A_h, [dstin, 8]
+	//stp	D_l, D_h, [dstend, -16]
+	str D_l, [dstend, -16]
+	str D_h, [dstend, -8]
 	ret
 
 	.p2align 4
@@ -150,12 +158,24 @@ L(copy96):
 	ldp	D_l, D_h, [src, 48]
 	ldp	E_l, E_h, [srcend, -32]
 	ldp	F_l, F_h, [srcend, -16]
-	stp	A_l, A_h, [dstin]
-	stp	B_l, B_h, [dstin, 16]
-	stp	C_l, C_h, [dstin, 32]
-	stp	D_l, D_h, [dstin, 48]
-	stp	E_l, E_h, [dstend, -32]
-	stp	F_l, F_h, [dstend, -16]
+	//stp	A_l, A_h, [dstin]
+	str A_l, [dstin]
+	str A_h, [dstin, 8]
+	//stp	B_l, B_h, [dstin, 16]
+	str B_l, [dstin, 16]
+	str B_h, [dstin, 24]
+	//stp	C_l, C_h, [dstin, 32]
+	str C_l, [dstin, 32]
+	str C_h, [dstin, 40]
+	//stp	D_l, D_h, [dstin, 48]
+	str D_l, [dstin, 48]
+	str D_h, [dstin, 56]
+	//stp	E_l, E_h, [dstend, -32]
+	str E_l, [dstend, -32]
+	str E_h, [dstend, -24]
+	//stp	F_l, F_h, [dstend, -16]
+	str F_l, [dstend, -16]
+	str F_h, [dstend, -8]
 	ret
 
 	/* Align DST to 16 byte alignment so that we don't cross cache line
@@ -171,20 +191,31 @@ L(copy_long):
 	sub	src, src, tmp1
 	add	count, count, tmp1	/* Count is now 16 too large.  */
 	ldp	A_l, A_h, [src, 16]
-	stp	D_l, D_h, [dstin]
+	//stp	D_l, D_h, [dstin]
+	str D_l, [dstin]
+	str D_h, [dstin, 8]
 	ldp	B_l, B_h, [src, 32]
 	ldp	C_l, C_h, [src, 48]
 	ldp	D_l, D_h, [src, 64]!
 	subs	count, count, 128 + 16	/* Test and readjust count.  */
 	b.ls	L(last64)
 L(loop64):
-	stp	A_l, A_h, [dst, 16]
+	//stp	A_l, A_h, [dst, 16]
+	str A_l, [dst, 16]
+	str A_h, [dst, 24]
 	ldp	A_l, A_h, [src, 16]
-	stp	B_l, B_h, [dst, 32]
+	//stp	B_l, B_h, [dst, 32]
+	str B_l, [dst, 32]
+	str B_h, [dst, 40]
 	ldp	B_l, B_h, [src, 32]
-	stp	C_l, C_h, [dst, 48]
+	//stp	C_l, C_h, [dst, 48]
+	str C_l, [dst, 48]
+	str C_h, [dst, 56]
 	ldp	C_l, C_h, [src, 48]
-	stp	D_l, D_h, [dst, 64]!
+	//stp	D_l, D_h, [dst, 64]!
+	str D_l, [dst, 64]
+	str D_h, [dst, 72]
+	add dst, dst, 64
 	ldp	D_l, D_h, [src, 64]!
 	subs	count, count, 64
 	b.hi	L(loop64)
@@ -194,17 +225,33 @@ L(loop64):
 	   there is just 1 byte left.  */
 L(last64):
 	ldp	E_l, E_h, [srcend, -64]
-	stp	A_l, A_h, [dst, 16]
+	//stp	A_l, A_h, [dst, 16]
+	str A_l, [dst, 16]
+	str A_h, [dst, 24]
 	ldp	A_l, A_h, [srcend, -48]
-	stp	B_l, B_h, [dst, 32]
+	//stp	B_l, B_h, [dst, 32]
+	str B_l, [dst, 32]
+	str B_h, [dst, 40]
 	ldp	B_l, B_h, [srcend, -32]
-	stp	C_l, C_h, [dst, 48]
+	//stp	C_l, C_h, [dst, 48]
+	str C_l, [dst, 48]
+	str C_h, [dst, 56]
 	ldp	C_l, C_h, [srcend, -16]
-	stp	D_l, D_h, [dst, 64]
-	stp	E_l, E_h, [dstend, -64]
-	stp	A_l, A_h, [dstend, -48]
-	stp	B_l, B_h, [dstend, -32]
-	stp	C_l, C_h, [dstend, -16]
+	//stp	D_l, D_h, [dst, 64]
+	str D_l, [dst, 64]
+	str D_h, [dst, 72]
+	//stp	E_l, E_h, [dstend, -64]
+	str E_l, [dstend, -64]
+	str E_h, [dstend, -56]
+	//stp	A_l, A_h, [dstend, -48]
+	str A_l, [dstend, -48]
+	str A_h, [dstend, -40]
+	//stp	B_l, B_h, [dstend, -32]
+	str B_l, [dstend, -32]
+	str B_h, [dstend, -24]
+	//stp	C_l, C_h, [dstend, -16]
+	str C_l, [dstend, -16]
+	str C_h, [dstend, -8]
 	ret
 
 	.p2align 4
@@ -224,7 +271,9 @@ L(move_long):
 	sub	srcend, srcend, tmp1
 	sub	count, count, tmp1
 	ldp	A_l, A_h, [srcend, -16]
-	stp	D_l, D_h, [dstend, -16]
+	//stp	D_l, D_h, [dstend, -16]
+	str D_l, [dstend, -16]
+	str D_h, [dstend, -8]
 	ldp	B_l, B_h, [srcend, -32]
 	ldp	C_l, C_h, [srcend, -48]
 	ldp	D_l, D_h, [srcend, -64]!
@@ -234,13 +283,22 @@ L(move_long):
 
 	nop
 1:
-	stp	A_l, A_h, [dstend, -16]
+	//stp	A_l, A_h, [dstend, -16]
+	str A_l, [dstend, -16]
+	str A_h, [dstend, -8]
 	ldp	A_l, A_h, [srcend, -16]
-	stp	B_l, B_h, [dstend, -32]
+	//stp	B_l, B_h, [dstend, -32]
+	str B_l, [dstend, -32]
+	str B_h, [dstend, -24]
 	ldp	B_l, B_h, [srcend, -32]
-	stp	C_l, C_h, [dstend, -48]
+	//stp	C_l, C_h, [dstend, -48]
+	str C_l, [dstend, -48]
+	str C_h, [dstend, -40]
 	ldp	C_l, C_h, [srcend, -48]
-	stp	D_l, D_h, [dstend, -64]!
+	//stp	D_l, D_h, [dstend, -64]!
+	str D_l, [dstend, -64]
+	str D_h, [dstend, -56]
+	sub dstend, dstend, 64
 	ldp	D_l, D_h, [srcend, -64]!
 	subs	count, count, 64
 	b.hi	1b
@@ -250,17 +308,33 @@ L(move_long):
 	   there is just 1 byte left.  */
 2:
 	ldp	G_l, G_h, [src, 48]
-	stp	A_l, A_h, [dstend, -16]
+	//stp	A_l, A_h, [dstend, -16]
+	str A_l, [dstend, -16]
+	str A_h, [dstend, -8]
 	ldp	A_l, A_h, [src, 32]
-	stp	B_l, B_h, [dstend, -32]
+	//stp	B_l, B_h, [dstend, -32]
+	str B_l, [dstend, -32]
+	str B_h, [dstend, -24]
 	ldp	B_l, B_h, [src, 16]
-	stp	C_l, C_h, [dstend, -48]
+	//stp	C_l, C_h, [dstend, -48]
+	str C_l, [dstend, -48]
+	str C_h, [dstend, -40]
 	ldp	C_l, C_h, [src]
-	stp	D_l, D_h, [dstend, -64]
-	stp	G_l, G_h, [dstin, 48]
-	stp	A_l, A_h, [dstin, 32]
-	stp	B_l, B_h, [dstin, 16]
-	stp	C_l, C_h, [dstin]
+	//stp	D_l, D_h, [dstend, -64]
+	str D_l, [dstend, -64]
+	str D_h, [dstend, -56]
+	//stp	G_l, G_h, [dstin, 48]
+	str G_l, [dstin, 48]
+	str G_l, [dstin, 56]
+	//stp	A_l, A_h, [dstin, 32]
+	str A_l, [dstin, 32]
+	str A_h, [dstin, 40]
+	//stp	B_l, B_h, [dstin, 16]
+	str B_l, [dstin, 16]
+	str B_h, [dstin, 24]
+	//stp	C_l, C_h, [dstin]
+	str C_l, [dstin]
+	str C_h, [dstin, 8]
 3:	ret
 
 END (MEMCPY)

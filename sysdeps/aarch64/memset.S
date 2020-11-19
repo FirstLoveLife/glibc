@@ -74,8 +74,12 @@ L(set_medium):
 	   32 bytes from the end.  */
 L(set96):
 	str	q0, [dstin, 16]
-	stp	q0, q0, [dstin, 32]
-	stp	q0, q0, [dstend, -32]
+	//stp	q0, q0, [dstin, 32]
+	str q0, [dstin, 32]
+	str q0, [dstin, 48]
+	//stp	q0, q0, [dstend, -32]
+	str q0, [dstend, -32]
+	str q0, [dstend, -16]
 	ret
 
 	.p2align 3
@@ -91,13 +95,22 @@ L(no_zva):
 	sub	count, dstend, dst	/* Count is 16 too large.  */
 	add	dst, dst, 16
 	sub	count, count, 64 + 16	/* Adjust count and bias for loop.  */
-1:	stp	q0, q0, [dst], 64
-	stp	q0, q0, [dst, -32]
+1:	//stp	q0, q0, [dst], 64
+	str q0, [dst]
+	str q0, [dst, 16]
+	add dst, dst, 64
+	//stp	q0, q0, [dst, -32]
+	str q0, [dst, -32]
+	str q0, [dst, -16]
 L(tail64):
 	subs	count, count, 64
 	b.hi	1b
-2:	stp	q0, q0, [dstend, -64]
-	stp	q0, q0, [dstend, -32]
+2:	//stp	q0, q0, [dstend, -64]
+	str q0, [dstend, -64]
+	str q0, [dstend, -48]
+	//stp	q0, q0, [dstend, -32]
+	str q0, [dstend, -32]
+	str q0, [dstend, -16]
 	ret
 
 L(try_zva):
@@ -116,10 +129,16 @@ L(try_zva):
 	 */
 L(zva_64):
 	str	q0, [dst, 16]
-	stp	q0, q0, [dst, 32]
+	//stp	q0, q0, [dst, 32]
+	str q0, [dst, 32]
+	str q0, [dst, 48]
 	bic	dst, dst, 63
-	stp	q0, q0, [dst, 64]
-	stp	q0, q0, [dst, 96]
+	//stp	q0, q0, [dst, 64]
+	str q0, [dst, 64]
+	str q0, [dst, 80]
+	//stp	q0, q0, [dst, 96]
+	str q0, [dst, 96]
+	str q0, [dst, 112]
 	sub	count, dstend, dst	/* Count is now 128 too large.	*/
 	sub	count, count, 128+64+64	/* Adjust count and bias for loop.  */
 	add	dst, dst, 128
@@ -128,10 +147,18 @@ L(zva_64):
 	add	dst, dst, 64
 	subs	count, count, 64
 	b.hi	1b
-	stp	q0, q0, [dst, 0]
-	stp	q0, q0, [dst, 32]
-	stp	q0, q0, [dstend, -64]
-	stp	q0, q0, [dstend, -32]
+	//stp	q0, q0, [dst, 0]
+	str q0, [dst, 0]
+	str q0, [dst, 16]
+	//stp	q0, q0, [dst, 32]
+	str q0, [dst, 32]
+	str q0, [dst, 48]
+	//stp	q0, q0, [dstend, -64]
+	str q0, [dstend, -64]
+	str q0, [dstend, -48]
+	//stp	q0, q0, [dstend, -32]
+	str q0, [dstend, -32]
+	str q0, [dstend, -16]
 	ret
 
 	.p2align 3
@@ -140,9 +167,15 @@ L(zva_128):
 	b.ne	L(zva_other)
 
 	str	q0, [dst, 16]
-	stp	q0, q0, [dst, 32]
-	stp	q0, q0, [dst, 64]
-	stp	q0, q0, [dst, 96]
+	//stp	q0, q0, [dst, 32]
+	str q0, [dst, 32]
+	str q0, [dst, 48]
+	//stp	q0, q0, [dst, 64]
+	str q0, [dst, 64]
+	str q0, [dst, 80]
+	//stp	q0, q0, [dst, 96]
+	str q0, [dst, 96]
+	str q0, [dst, 112]
 	bic	dst, dst, 127
 	sub	count, dstend, dst	/* Count is now 128 too large.	*/
 	sub	count, count, 128+128	/* Adjust count and bias for loop.  */
@@ -151,10 +184,18 @@ L(zva_128):
 	add	dst, dst, 128
 	subs	count, count, 128
 	b.hi	1b
-	stp	q0, q0, [dstend, -128]
-	stp	q0, q0, [dstend, -96]
-	stp	q0, q0, [dstend, -64]
-	stp	q0, q0, [dstend, -32]
+	//stp	q0, q0, [dstend, -128]
+	str q0, [dstend, -128]
+	str q0, [dstend, -112]
+	//stp	q0, q0, [dstend, -96]
+	str q0, [dstend, -96]
+	str q0, [dstend, -80]
+	//stp	q0, q0, [dstend, -64]
+	str q0, [dstend, -64]
+	str q0, [dstend, -48]
+	//stp	q0, q0, [dstend, -32]
+	str q0, [dstend, -32]
+	str q0, [dstend, -16]
 	ret
 
 L(zva_other):
@@ -170,8 +211,13 @@ L(zva_other):
 	subs	count, tmp1, dst	/* Actual alignment bytes to write.  */
 	bic	tmp1, tmp1, tmp2	/* Aligned dc zva start address.  */
 	beq	2f
-1:	stp	q0, q0, [dst], 64
-	stp	q0, q0, [dst, -32]
+1:	//stp	q0, q0, [dst], 64
+	str q0, [dst]
+	str q0, [dst, 16]
+	add dst, dst, 64
+	//stp	q0, q0, [dst, -32]
+	str q0, [dst, -32]
+	str q0, [dst, -16]
 	subs	count, count, 64
 	b.hi	1b
 2:	mov	dst, tmp1
